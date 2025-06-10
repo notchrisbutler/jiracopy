@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert Jira markdown to HTML that renders properly in Jira Cloud comments">
+    <title>Jira Markdown to HTML Converter</title>
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23206ba5'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header" role="banner">
+        <div class="header-content">
+            <h1 class="app-title">
+                <span class="title-icon" aria-hidden="true">📝</span>
+                Jira Markdown to HTML Converter
+            </h1>
+            <p class="app-subtitle">Convert markdown to HTML that renders properly in Jira Cloud</p>
+        </div>
+    </header>
+
+    <!-- Main Application -->
+    <main class="app-main" role="main">
+        <div class="converter-container">
+            <!-- Input Panel -->
+            <section class="input-panel" aria-labelledby="input-title">
+                <div class="panel-header">
+                    <h2 id="input-title" class="panel-title">Markdown Input</h2>
+                    <div class="panel-stats">
+                        <span class="char-count" aria-live="polite">0 characters</span>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <textarea 
+                        id="markdown-input"
+                        class="markdown-textarea"
+                        placeholder="Paste your Jira markdown here..."
+                        aria-label="Enter your markdown text"
+                        spellcheck="false"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        rows="20"
+                    ># Hello World
+This is **bold** and *italic* text.
+[Link](https://example.com)</textarea>
+                </div>
+            </section>
+
+            <!-- Output Panel -->
+            <section class="output-panel" aria-labelledby="output-title">
+                <div class="panel-header">
+                    <h2 id="output-title" class="panel-title">Jira Cloud Preview</h2>
+                    <div class="panel-actions">
+                        <button 
+                            id="copy-button"
+                            class="copy-button"
+                            aria-label="Copy HTML to clipboard"
+                            disabled
+                        >
+                            <span class="button-icon" aria-hidden="true">📋</span>
+                            <span class="button-text">Copy HTML</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="preview-container">
+                        <div class="dual-preview-layout">
+                            <div class="preview-section">
+                                <div class="preview-header">
+                                    <h3 class="preview-title">☀️ Light Theme</h3>
+                                </div>
+                                <div 
+                                    id="jira-preview-light"
+                                    class="jira-preview jira-light"
+                                    aria-label="Jira Light Theme Preview"
+                                >
+                                    <div class="placeholder-message">
+                                        <span class="placeholder-icon" aria-hidden="true">✨</span>
+                                        <p>Your Jira Light theme preview will appear here...</p>
+                                        <p class="placeholder-hint">Start typing markdown in the left panel to see results</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="preview-section">
+                                <div class="preview-header">
+                                    <h3 class="preview-title">🌙 Dark Theme</h3>
+                                </div>
+                                <div 
+                                    id="jira-preview-dark"
+                                    class="jira-preview jira-dark"
+                                    aria-label="Jira Dark Theme Preview"
+                                >
+                                    <div class="placeholder-message">
+                                        <span class="placeholder-icon" aria-hidden="true">✨</span>
+                                        <p>Your Jira Dark theme preview will appear here...</p>
+                                        <p class="placeholder-hint">Start typing markdown in the left panel to see results</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar" role="status" aria-live="polite">
+            <div class="status-item processing-time" style="display: none;">
+                <span class="status-label">Processing time:</span>
+                <span class="status-value" id="processing-time">0ms</span>
+            </div>
+            <div class="status-item element-count" style="display: none;">
+                <span class="status-label">Elements:</span>
+                <span class="status-value" id="element-count">0</span>
+            </div>
+            <div class="status-item" id="status-message" style="display: none;">
+                <span class="status-text"></span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer" role="contentinfo">
+        <div class="footer-content">
+            <p class="footer-text">
+                💡 <strong>Tip:</strong> This tool processes everything locally in your browser. 
+                Your data never leaves your device.
+            </p>
+            <div class="footer-links">
+                <button type="button" class="link-button" id="help-button">
+                    Help & Examples
+                </button>
+                <span class="separator" aria-hidden="true">•</span>
+                <button type="button" class="link-button" id="about-button">
+                    About
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal" role="dialog" aria-labelledby="help-modal-title" aria-hidden="true">
+        <div class="modal-overlay" aria-hidden="true"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="help-modal-title" class="modal-title">Help & Examples</h2>
+                <button class="modal-close" aria-label="Close help modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3>Supported Markdown Elements</h3>
+                    <div class="help-examples">
+                        <div class="help-example">
+                            <h4>Text Formatting</h4>
+                            <code>**bold** *italic* `code` ~~strikethrough~~</code>
+                        </div>
+                        <div class="help-example">
+                            <h4>Links</h4>
+                            <code>[Link Text](https://example.com)</code>
+                        </div>
+                        <div class="help-example">
+                            <h4>Lists</h4>
+                            <code>- Item 1<br>- Item 2<br>  - Nested item</code>
+                        </div>
+                        <div class="help-example">
+                            <h4>Headers</h4>
+                            <code># H1<br>## H2<br>### H3</code>
+                        </div>
+                        <div class="help-example">
+                            <h4>Code Blocks</h4>
+                            <code>```javascript<br>console.log('Hello');<br>```</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal" role="dialog" aria-labelledby="about-modal-title" aria-hidden="true">
+        <div class="modal-overlay" aria-hidden="true"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="about-modal-title" class="modal-title">About This Tool</h2>
+                <button class="modal-close" aria-label="Close about modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="about-content">
+                    <p>
+                        This tool converts legacy Jira markdown syntax to HTML that renders 
+                        properly in Jira Cloud comment boxes.
+                    </p>
+                    <ul>
+                        <li>✅ 100% local processing - your data never leaves your device</li>
+                        <li>✅ Real-time conversion as you type</li>
+                        <li>✅ Optimized for Jira Cloud compatibility</li>
+                        <li>✅ No installation required</li>
+                    </ul>
+                    <p>
+                        <strong>How to use:</strong> Paste your markdown, copy the generated HTML, 
+                        and paste it into Jira Cloud for proper formatting.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">Processing markdown...</p>
+        </div>
+    </div>
+
+    <!-- Copy Feedback -->
+    <div id="copy-feedback" class="copy-feedback" aria-hidden="true" role="alert">
+        <span class="feedback-icon"></span>
+        <span class="feedback-text"></span>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html> 
